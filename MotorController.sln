@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.902
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "MotorController", "MotorController\MotorController.pyproj", "{D916E30B-182A-4195-9EA9-F893F413BA44}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D916E30B-182A-4195-9EA9-F893F413BA44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D916E30B-182A-4195-9EA9-F893F413BA44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {866BE971-B0D1-42C4-963A-F8D00E31C8A1}
+	EndGlobalSection
+EndGlobal
