@@ -11,6 +11,13 @@
     <OutputPath>.</OutputPath>
     <Name>MotorController</Name>
     <RootNamespace>MotorController</RootNamespace>
+    <InterpreterId>CondaEnv|CondaEnv|motor_control</InterpreterId>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterArguments>
+    </InterpreterArguments>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
+    <Environment>
+    </Environment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,7 +28,25 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Motor1Control.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Motor2Control.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MotorCommunication.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MotorController.py" />
+    <Compile Include="ReadOnlyDial.py">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="CondaEnv|CondaEnv|motor_control" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="logs\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
