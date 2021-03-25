@@ -1,11 +1,12 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 import qdarkstyle
 
-import sys
+import sys, os
 import time
 
 from Motor1Control import *
 from Motor2Control import *
+from ScriptEditor import ScriptEditor
 
 from MotorCommunication import *
 
@@ -13,6 +14,9 @@ from MotorCommunication import *
 debug = True
 
 tstart = time.time()
+
+if not os.path.exists("logs/"):
+    os.mkdir("logs/")
 
 script_log = r"logs/script_history_" + str(tstart) + ".txt"
 if debug is False:
@@ -25,7 +29,6 @@ else:
 
 #script_log.info(str(time.time()))
 #normal_log.info(str(time.time()))
-
 ser = MotorControlCxn(script_log, debug=True)
 
 app = QtWidgets.QApplication([])
@@ -34,10 +37,12 @@ app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
 
 m1 = Motor1Control(ser, normal_log)
 m2 = Motor2Control(ser, normal_log)
+editor = ScriptEditor(m1, m2, normal_log)
 
 layout = QtWidgets.QHBoxLayout()
 layout.addWidget(m1)
 layout.addWidget(m2)
+layout.addWidget(editor)
 w = QtWidgets.QWidget()
 w.setLayout(layout)
 

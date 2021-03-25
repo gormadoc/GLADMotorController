@@ -1,5 +1,17 @@
 import serial
+import DebugSerialTarget
 
+''' Relevant commands
+        xPR: print value of parameter (all in steps)
+            P: position
+            VM: maximum velocity
+            MS: set step resolution
+        xMA y: set position to y
+        xVM y: set rotation rate
+        xH: hold until done
+
+
+'''
 
 class MotorControlCxn():
     def __init__(self, log, debug=False, *args, **kwargs):
@@ -15,6 +27,8 @@ class MotorControlCxn():
         self.bytesize = serial.EIGHTBITS
 
         self.ser = serial.Serial(port=None, baudrate = self.baudrate, bytesize=self.bytesize)
+
+        self.debug_target = DebugSerialTarget.DebugSerialTarget()
 
 
     def connect(self):
@@ -39,6 +53,13 @@ class MotorControlCxn():
         self.log(command)
         if self.debug:
             self.log("Writing to debug port {}".format(self.port))
+            motor = self.debug_target.motors[int(command[0])-1]
+            if command[1:3] == "MA":
+                self.debug_target.setPosition(motor, int(command[4:]))
+            elif command[1:3] == "VM":
+                self.debug_target.setRate(motor, int(command[4:]))
+            elif command[1:3] == "MS":
+                self.debug_target.setStepResolution(motor, int(command[4:]))
             return 1
         else:
             return self.ser.write((command + '\n').encode('utf-8'))
@@ -70,20 +91,22 @@ class MotorControlCxn():
             self.log("<\t" + response)
         else:
             response = ""
-            if "PR MS" in command:
-                response = "256" # default value
-                self.log("<\t" + response)
-            elif "PR P" in command:
-                response = "7111"
-                self.log("<\t" + response)
-            elif "PR VM" in command:
-                response = "768000" # default value
-                self.log("<\t" + response)
+            if len(command) > 0:
+                motor = self.debug_target.motors[int(command[0])-1]
+                if "PR MS" in command:
+                    response = str(self.debug_target.getStepResolution(motor))
+                    self.log("<\t" + response)
+                elif "PR P" in command:
+                    response = str(self.debug_target.getPosition(motor))
+                    self.log("<\t" + response)
+                elif "PR VM" in command:
+                    response = str(self.debug_target.getRate(motor))
+                    self.log("<\t" + response)
             return response
 
 
     def log(self, msg):
-        if self.log_file is not "":
+        if self.log_file != "":
             with open(self.log_file, 'a') as f:
                 print(msg, file=f)
         else:

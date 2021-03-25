@@ -53,7 +53,7 @@ class Motor1Control(QtWidgets.QWidget):
         rateValidator = QtGui.QDoubleValidator(1.0, 5000000, 2)
         
         # Position controls
-        self.posLabel = QtWidgets.QLabel("Tilt (degrees)")
+        self.posLabel = QtWidgets.QLabel("Rotation (degrees)")
         self.posBox = QtWidgets.QLineEdit("")
         self.posBox.setPlaceholderText("Enter tilt")
         self.posBox.setValidator(angleValidator)
@@ -113,6 +113,7 @@ class Motor1Control(QtWidgets.QWidget):
             self.rate = angleVel
         return
 
+
     def setAngle(self, value):
         value = round(value / 360.0 * self.step_resolution * 200)
         round_angle = value * 360.0 / self.step_resolution / 200
@@ -137,6 +138,16 @@ class Motor1Control(QtWidgets.QWidget):
             self.log("Setting angle: " + angle)
             self.setAngle(fangle)
         return
+        
+
+    def getAngle(self):
+        stepPos = float(self.connection.sendCommand(str(self.motorID) + "PR P"))
+        anglePos = stepPos * 360.0 / self.step_resolution / 200
+        self.dial.setValue(anglePos)
+        self.posMonBox.setText(str(round(anglePos, 3)))
+        self.angle = anglePos
+        return self.angle
+
 
     def rotateContinuously(self, value):
         if self.currently_rotating is False:
@@ -154,12 +165,14 @@ class Motor1Control(QtWidgets.QWidget):
             self.currently_rotating = False
             self.log("Stopped rotating.")
 
+
     def setRate(self, value):
         value = round(value / 360.0 * self.step_resolution * 200)
         round_rate = value * 360.0 / self.step_resolution / 200
         self.connection.sendCommand(str(self.motorID) + "VM " + str(value))
         self.rotMonBox.setText(str(round(round_rate, 3)))
         self.rate = round_rate
+
 
     def enteredRate(self):
         rate = self.rotBox.text()
@@ -179,6 +192,16 @@ class Motor1Control(QtWidgets.QWidget):
             self.log("No rate entered.")
         return
 
+    
+    def getRate(self):
+        # Get velocity (in steps)
+        stepVel = float(self.connection.sendCommand(str(self.motorID) + "PR VM"))
+        angleVel = stepVel * 360.0 / self.step_resolution / 200
+        self.rotMonBox.setText(str(round(angleVel, 3)))
+        self.rate = angleVel
+        return self.rate
+
+
     def constantRotation(self):
         self.constant = not self.constant
         
@@ -195,9 +218,19 @@ class Motor1Control(QtWidgets.QWidget):
             self.rotMonBox.setText(str(self.rate))
         return
 
+
+    def goToPositionOverTime(self, position, time):
+        self.setRate((position - self.angle) / time)
+        self.setAngle(position)
+
+
+    def hold(self):
+        self.connection.sendCommand(str(self.motorID) + "H")
+
+
     def log(self, msg):
         msg = "MOTOR1: " + msg
-        if self.log_file is not "":
+        if self.log_file != "":
             with open(self.log_file, 'a') as f:
                 print(msg, file=f)
         else:

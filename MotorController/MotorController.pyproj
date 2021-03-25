@@ -11,7 +11,7 @@
     <OutputPath>.</OutputPath>
     <Name>MotorController</Name>
     <RootNamespace>MotorController</RootNamespace>
-    <InterpreterId>CondaEnv|CondaEnv|motor_control</InterpreterId>
+    <InterpreterId>Global|ContinuumAnalytics|Anaconda38-64</InterpreterId>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <InterpreterArguments>
     </InterpreterArguments>
@@ -28,6 +28,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="DebugSerialTarget.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Motor1Control.py">
       <SubType>Code</SubType>
     </Compile>
@@ -41,9 +44,11 @@
     <Compile Include="ReadOnlyDial.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ScriptEditor.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="CondaEnv|CondaEnv|motor_control" />
+    <InterpreterReference Include="Global|ContinuumAnalytics|Anaconda38-64" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="logs\" />

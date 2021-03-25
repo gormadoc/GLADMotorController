@@ -88,6 +88,7 @@ class Motor2Control(QtWidgets.QWidget):
 
         self.initMotor()
 
+
     def initMotor(self):
         # Most important to get step resolution first
         self.step_resolution = float(self.connection.sendCommand(str(self.motorID) + "PR MS"))
@@ -104,6 +105,7 @@ class Motor2Control(QtWidgets.QWidget):
         angleVel = stepVel * 360.0 / self.step_resolution / 200
         self.rotMonBox.setText(str(round(angleVel, 3)))
 
+
     def setAngle(self, value):
         value = round(value / 360.0 * self.step_resolution * 200)
         round_angle = value * 360.0 / self.step_resolution / 200
@@ -112,7 +114,8 @@ class Motor2Control(QtWidgets.QWidget):
         self.posMonBox.setText(str(round(round_angle, 3)))
         self.dial.setValue(round_angle)
         self.angle = round_angle
-            
+          
+        
     def enteredAngle(self):
         angle = self.posBox.text()
 
@@ -139,6 +142,7 @@ class Motor2Control(QtWidgets.QWidget):
         self.rotMonBox.setText(str(round(round_rate, 3)))
         self.rate = round_rate
 
+
     def enteredRate(self):
         rate = self.rotBox.text()
         try:
@@ -154,9 +158,32 @@ class Motor2Control(QtWidgets.QWidget):
             self.log("No rate entered.")
         return
 
+
+    def getRate(self):
+        # Get velocity (in steps)
+        stepVel = float(self.connection.sendCommand(str(self.motorID) + "PR VM"))
+        angleVel = stepVel * 360.0 / self.step_resolution / 200
+        self.rotMonBox.setText(str(round(angleVel, 3)))
+        self.rate = angleVel
+        return self.rate
+
+
+    def getAngle(self):
+        stepPos = float(self.connection.sendCommand(str(self.motorID) + "PR P"))
+        anglePos = stepPos * 360.0 / self.step_resolution / 200
+        self.dial.setValue(anglePos)
+        self.posMonBox.setText(str(round(anglePos, 3)))
+        self.angle = anglePos
+        return self.angle
+
+
+    def hold(self):
+        self.connection.sendCommand(str(self.motorID) + "H")
+
+
     def log(self, msg):
         msg = "MOTOR2: " + msg
-        if self.log_file is not "":
+        if self.log_file != "":
             with open(self.log_file, 'a') as f:
                 print(msg, file=f)
         else:
