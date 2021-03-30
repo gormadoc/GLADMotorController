@@ -3,15 +3,16 @@ import qdarkstyle
 import MotorCommunication
 
 
-commands = ['get', 'hold', 'set']
+commands = ['get', 'hold', 'set', 'move']
 motors = ['m1', 'm2']
 parameters = ['position', 'rate']
 times = ['for', 'over']
 
 
 class ScriptEditor(QtWidgets.QWidget):
-    def __init__(self, motor1, motor2, log, *args, **kwargs):
+    def __init__(self, connection, motor1, motor2, log, *args, **kwargs):
         super(ScriptEditor, self).__init__(*args, **kwargs)
+        self.connection = connection
         self.motor1 = motor1
         self.motor2 = motor2
 
@@ -30,6 +31,7 @@ class ScriptEditor(QtWidgets.QWidget):
         layout.addWidget(self.output)
         layout.addWidget(self.executeBtn)
         self.setLayout(layout)
+
 
     def execute(self):
         blocks = self.interpretInput()
@@ -55,6 +57,9 @@ class ScriptEditor(QtWidgets.QWidget):
                             self.motor1.setRate(block['value'])
                         else:
                             pass # no implementation yet
+                elif block['command'] == 'move':
+                    if block['parameter'] == 'position':
+                        self.motor1.setAngle(self.motor1.angle + block['value'])
             elif block['motor'] == 'm2':
                 if block['command'] == 'get':
                     if block['parameter'] == 'position':
@@ -75,10 +80,14 @@ class ScriptEditor(QtWidgets.QWidget):
                             self.motor1.setRate(block['value'])
                         else:
                             pass # no implementation yet
+                elif block['command'] == 'move':
+                    if block['parameter'] == 'position':
+                        self.motor2.setAngle(self.motor2.angle + block['value'])
 
             # user probably wants to know what is happening
             if out:
                 self.appendOutput(out)
+        return
 
 
     def interpretInput(self):
@@ -190,16 +199,26 @@ class ScriptEditor(QtWidgets.QWidget):
                 if value < 0:
                     value = value % 360
                 if motor == 'm2' and (value < 0 or value > 90):
-                    self.appendOutput("ERROR: Motor 2 must be in range 0-90 deg in line {}".format(lines.index(line)))
+                    self.appendOutput("ERROR: Motor 2 must remain in range 0-90 deg in line {}".format(lines.index(line)))
                     parses = False
                     continue
+            elif command == 'move':
+                if motor == 'm2' and (value + self.motor2.angle < 0 or value + self.motor2.angle > 90):
+                    self.appendOutput("ERROR: Motor 2 must remain in range 0-90 deg in line {}".format(lines.index(line)))
+                    parses = False
+                    continue
+            block.append({'motor': motor, 'command': command, 'parameter': parameter, 'value': value, 'time': time, 'timespan': timespan})
 
-                block.append({'motor': motor, 'command': command, 'parameter': parameter, 'value': value, 'time': time, 'timespan': timespan})
         if parses:
             return block
         else:
             return []
 
+
+    def emergencyStop(self):
+        self.connection.sendCommand("\e")
+        self.appendOutput("Emergency stop activated!")
+        return
 
     def appendOutput(self, string):
         txt = self.output.toPlainText()
@@ -208,6 +227,7 @@ class ScriptEditor(QtWidgets.QWidget):
         self.output.setPlainText(txt)
         #except:
         #    print("Couldn't append \"" + string + "\" to output box.")
+        return
     
     def textChanged(self):
         text = self.editor.toPlainText()
@@ -228,6 +248,4 @@ class ScriptEditor(QtWidgets.QWidget):
             print(html_text)
         self.editor.setPlainText(html_text)
         return
-
-
 

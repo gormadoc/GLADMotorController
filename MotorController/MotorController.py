@@ -37,7 +37,7 @@ app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
 
 m1 = Motor1Control(ser, normal_log)
 m2 = Motor2Control(ser, normal_log)
-editor = ScriptEditor(m1, m2, normal_log)
+editor = ScriptEditor(ser, m1, m2, normal_log)
 
 layout = QtWidgets.QHBoxLayout()
 layout.addWidget(m1)

@@ -11,7 +11,7 @@
     <OutputPath>.</OutputPath>
     <Name>MotorController</Name>
     <RootNamespace>MotorController</RootNamespace>
-    <InterpreterId>Global|ContinuumAnalytics|Anaconda38-64</InterpreterId>
+    <InterpreterId>Global|ContinuumAnalytics|Anaconda37-64</InterpreterId>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <InterpreterArguments>
     </InterpreterArguments>
@@ -47,8 +47,7 @@
     <Compile Include="ScriptEditor.py" />
   </ItemGroup>
   <ItemGroup>
-    <InterpreterReference Include="CondaEnv|CondaEnv|motor_control" />
-    <InterpreterReference Include="Global|ContinuumAnalytics|Anaconda38-64" />
+    <InterpreterReference Include="Global|ContinuumAnalytics|Anaconda37-64" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="logs\" />
