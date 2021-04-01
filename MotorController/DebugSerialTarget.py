@@ -85,12 +85,12 @@ class DebugSerialTarget(QtWidgets.QWidget):
                         self._positions[m] = c['value']
                     else:
                         if self._positions[m] > c['value']:
-                            self._positions[m] -= self._rates[m]*self._delta_t
+                            self._positions[m] -= int(self._rates[m]*self._delta_t)
                         else:
-                            self._positions[m] += self._rates[m]*self._delta_t
+                            self._positions[m] += int(self._rates[m]*self._delta_t)
                 elif c['command'] == 'SL':
                     if complete_flag:
-                        self._positions[m] += self._rates[m]*(last-tick - c['time'])
+                        self._positions[m] += int(self._rates[m]*(last-tick - c['time']))
                 elif c['command'] == 'VM':
                     self._rates[m] = int(c['value'])
                 elif c['command'] == 'PR':
