@@ -8,6 +8,9 @@ I use Anaconda with Python 3.8.5
   * os
   * sys
   * time
+
+# Other software
+For debugging I've used com0com to setup virtual COM ports `COM8` (program side) and `COM9` (virtual motor controller). It may be necessary to use a specific version of com0com (see issue here: https://sourceforge.net/p/com0com/bugs/32/); I used version 2.2.2.0 and renamed the default virtual ports. I have not added anything to do this without user intervention yet.
   
 # Goals
 The software packaged with the MC was just a text terminal for entering in machine commands over serial. 
@@ -20,6 +23,6 @@ Motor one controls the rotation of the sample and motor two controls the tilt. A
 # Current status
  * All scripting is line-by-line, working similar to the terminal interface with more readability and error checking.
  * Scripts cannot be saved or loaded (copy-paste works in the box though).
- * No scheduling.
+ * Scheduling is in a preliminary state.
  * Not all controller commands are implemented; it might never be necessary to include more.
  * Step resolution cannot currently be controlled; perhaps it will never be.
