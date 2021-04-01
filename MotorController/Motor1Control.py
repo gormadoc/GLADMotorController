@@ -119,9 +119,9 @@ class Motor1Control(QtWidgets.QWidget):
         round_angle = value * 360.0 / self.step_resolution / 200
         self.connection.sendCommand(str(self.motorID) + "MA " + str(value))
         self.connection.sendCommand(str(self.motorID) + "H")
-        self.posMonBox.setText(str(round(round_angle, 3)))
-        self.dial.setValue(round_angle)
-        self.angle = round_angle
+        #self.posMonBox.setText(str(round(round_angle, 3)))
+        #self.dial.setValue(round_angle)
+        #self.angle = round_angle
             
     def enteredAngle(self):
         angle = self.posBox.text()
@@ -170,8 +170,8 @@ class Motor1Control(QtWidgets.QWidget):
         value = round(value / 360.0 * self.step_resolution * 200)
         round_rate = value * 360.0 / self.step_resolution / 200
         self.connection.sendCommand(str(self.motorID) + "VM " + str(value))
-        self.rotMonBox.setText(str(round(round_rate, 3)))
-        self.rate = round_rate
+        #self.rotMonBox.setText(str(round(round_rate, 3)))
+        #self.rate = round_rate
 
 
     def enteredRate(self):
@@ -226,6 +226,11 @@ class Motor1Control(QtWidgets.QWidget):
 
     def hold(self):
         self.connection.sendCommand(str(self.motorID) + "H")
+
+
+    def update(self):
+        self.getAngle()
+        self.getRate()
 
 
     def log(self, msg):

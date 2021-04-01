@@ -22,6 +22,8 @@ class ScriptEditor(QtWidgets.QWidget):
         self.output = QtWidgets.QTextEdit("")
         self.output.setReadOnly(True)
 
+        
+
         self.executeBtn = QtWidgets.QPushButton("Execute")
         self.executeBtn.clicked.connect(self.execute)
 
@@ -30,6 +32,7 @@ class ScriptEditor(QtWidgets.QWidget):
         layout.addWidget(self.output)
         layout.addWidget(self.executeBtn)
         self.setLayout(layout)
+
 
     def execute(self):
         blocks = self.interpretInput()
@@ -206,8 +209,8 @@ class ScriptEditor(QtWidgets.QWidget):
         #try:
         txt += string + '\n'
         self.output.setPlainText(txt)
-        #except:
-        #    print("Couldn't append \"" + string + "\" to output box.")
+        return
+
     
     def textChanged(self):
         text = self.editor.toPlainText()
@@ -230,4 +233,10 @@ class ScriptEditor(QtWidgets.QWidget):
         return
 
 
-
+    def tick(self):
+        # update tick interval
+        if self.tick_number == self.update_interval // self.tick_time:
+            self.appendOutput("Timer tick")
+        self.tick_number %= (self.update_interval // self.tick_time)
+        self.tick_number += 1
+        return

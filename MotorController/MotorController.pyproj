@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>d916e30b-182a-4195-9ea9-f893f413ba44</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>MotorController.py</StartupFile>
+    <StartupFile>FrontEnd.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -18,6 +18,7 @@
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <Environment>
     </Environment>
+    <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -28,6 +29,12 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="FrontEnd.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Scheduler.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DebugSerialTarget.py">
       <SubType>Code</SubType>
     </Compile>
