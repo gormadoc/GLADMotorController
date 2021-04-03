@@ -11,7 +11,7 @@
     <OutputPath>.</OutputPath>
     <Name>MotorController</Name>
     <RootNamespace>MotorController</RootNamespace>
-    <InterpreterId>Global|ContinuumAnalytics|Anaconda37-64</InterpreterId>
+    <InterpreterId>Global|ContinuumAnalytics|Anaconda38-64</InterpreterId>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <InterpreterArguments>
     </InterpreterArguments>

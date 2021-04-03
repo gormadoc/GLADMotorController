@@ -62,3 +62,12 @@ class MotorController(QtWidgets.QWidget):
             self.m2.update()
         self._tick_number %= (self._update_interval // self._tick_time)
         self._tick_number += 1
+
+
+    def keyPressEvent(self, event):
+        key = event.key()
+        if key == QtCore.Qt.Key_Escape:
+            print("escaped")
+            self.m1.stopImmediately()
+            self.m2.stopImmediately()
+        return

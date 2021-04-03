@@ -101,7 +101,7 @@ class Motor2Control(QtWidgets.QWidget):
         self.angle = anglePos
 
         # Get velocity (in steps)
-        stepVel = float(self.connection.sendCommand(str(self.motorID) + "PR VM"))
+        stepVel = float(self.connection.sendCommand(str(self.motorID) + "PR V"))
         angleVel = stepVel * 360.0 / self.step_resolution / 200
         self.rotMonBox.setText(str(round(angleVel, 3)))
 
@@ -161,7 +161,7 @@ class Motor2Control(QtWidgets.QWidget):
 
     def getRate(self):
         # Get velocity (in steps)
-        stepVel = float(self.connection.sendCommand(str(self.motorID) + "PR VM"))
+        stepVel = float(self.connection.sendCommand(str(self.motorID) + "PR V"))
         angleVel = stepVel * 360.0 / self.step_resolution / 200
         self.rotMonBox.setText(str(round(angleVel, 3)))
         self.rate = angleVel
@@ -179,6 +179,10 @@ class Motor2Control(QtWidgets.QWidget):
 
     def hold(self):
         self.connection.sendCommand(str(self.motorID) + "H")
+
+
+    def stopImmediately(self):
+        self.connection.sendCommand(str(self.motorID) + "SL 0")
 
 
     def update(self):

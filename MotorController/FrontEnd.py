@@ -14,11 +14,7 @@ from MotorCommunication import *
 
 
 class MotorControllerWindow(QtWidgets.QMainWindow):
-    def keyPressEvent(self, event):
-        key = event.key()
-        if key == QtCore.Qt.Key_Escape:
-            print("escaped")
-        return
+    pass
 
 
 debug = True

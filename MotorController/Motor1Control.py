@@ -119,9 +119,7 @@ class Motor1Control(QtWidgets.QWidget):
         round_angle = value * 360.0 / self.step_resolution / 200
         self.connection.sendCommand(str(self.motorID) + "MA " + str(value))
         self.connection.sendCommand(str(self.motorID) + "H")
-        #self.posMonBox.setText(str(round(round_angle, 3)))
-        #self.dial.setValue(round_angle)
-        #self.angle = round_angle
+
             
     def enteredAngle(self):
         angle = self.posBox.text()
@@ -158,27 +156,31 @@ class Motor1Control(QtWidgets.QWidget):
             self.rotButton.setText("Stop constant rotation")
             self.currently_rotating = True
             self.log("Rotating continuously at " + str(round_rate) + " deg/sec.")
+            self.rotCheck.setDisabled(True)
         else:
             self.connection.sendCommand(str(self.motorID) + "SL 0")
             self.rotMonBox.setText("")
             self.rotButton.setText("Start constant rotation")
             self.currently_rotating = False
             self.log("Stopped rotating.")
+            self.rotCheck.setDisabled(False)
+
+
+    def stopImmediately(self):
+        self.connection.sendCommand(str(self.motorID) + "SL 0")
 
 
     def setRate(self, value):
         value = round(value / 360.0 * self.step_resolution * 200)
         round_rate = value * 360.0 / self.step_resolution / 200
         self.connection.sendCommand(str(self.motorID) + "VM " + str(value))
-        #self.rotMonBox.setText(str(round(round_rate, 3)))
-        #self.rate = round_rate
 
 
     def enteredRate(self):
         rate = self.rotBox.text()
         try:
             rate = float(rate)
-            if rate < 0 or rate > 5000000:
+            if rate < -5000000 or rate > 5000000:
                 # throw error
                 self.log("Rotation rate " + rate + " out-of-bounds")
             elif self.constant is False:    
@@ -187,7 +189,7 @@ class Motor1Control(QtWidgets.QWidget):
             else:
                 # perform a constant rotation until stopped (for a time?)
                 self.rotateContinuously(rate)
-        except:
+        except TypeError:
             # throw error
             self.log("No rate entered.")
         return
@@ -195,7 +197,7 @@ class Motor1Control(QtWidgets.QWidget):
     
     def getRate(self):
         # Get velocity (in steps)
-        stepVel = float(self.connection.sendCommand(str(self.motorID) + "PR VM"))
+        stepVel = float(self.connection.sendCommand(str(self.motorID) + "PR V"))
         angleVel = stepVel * 360.0 / self.step_resolution / 200
         self.rotMonBox.setText(str(round(angleVel, 3)))
         self.rate = angleVel
@@ -206,16 +208,19 @@ class Motor1Control(QtWidgets.QWidget):
         self.constant = not self.constant
         
         if self.constant is True:
+            rateValidator = QtGui.QDoubleValidator(-5000000, 5000000, 2)
             self.posBox.setText("")
             self.posBox.setDisabled(True)
             self.posButton.setDisabled(True)
             self.rotButton.setText("Start constant rotation")
             self.rotMonBox.setText("")
         else:
+            rateValidator = QtGui.QDoubleValidator(1.0, 5000000, 2)
             self.posBox.setDisabled(False)
             self.posButton.setDisabled(False)
             self.rotButton.setText("Set rotation rate")
             self.rotMonBox.setText(str(self.rate))
+        self.rotBox.setValidator(rateValidator)
         return
 
 
