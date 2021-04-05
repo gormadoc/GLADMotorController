@@ -81,10 +81,10 @@ class DebugSerialTarget(QtWidgets.QWidget):
 
                 # perform command
                 if c['command'] == 'MA' or c['command'] == 'MR':
-                    self._calculateCurrentPosition(m, self._maximum_rates[m])
+                    self._calculateCurrentPosition(m, c['direction'], self._maximum_rates[m])
                     self._target_position[m] = c['value']
                     # checking for completeness depends on direction
-                    if self._direction[m] == 1:
+                    if c['direction'] == 1:
                         # case where we're moving clockwise to a point behind us (like 350 -> 10 through 360)
                         if self._last_position[m] > self._target_position[m]:
                             if self._target_position[m] < self._current_position[m] < self._last_position[m]:
@@ -97,9 +97,11 @@ class DebugSerialTarget(QtWidgets.QWidget):
                             self._current_position[m] = self._target_position[m]
                             self.stopMovement(m)
                             self._current_commands[m] = None 
-                    if self._direction[m] == -1:
+                    elif c['direction'] == -1:
                         # case where we're moving counter-clockwise to a point ahead of us (like 10 -> 350 through 360)
                         if self._last_position[m] < self._target_position[m]:
+                            #if self._current_position[m] < 0:
+                            #    self._current_position[m] %= self.fullRevolution(m) 
                             if self._last_position[m] < self._current_position[m] < self._target_position[m]:
                                 # we've overshot
                                 self._current_position[m] = self._target_position[m]
@@ -113,29 +115,30 @@ class DebugSerialTarget(QtWidgets.QWidget):
                     # restrict the values to the proper range
                     self._current_position[m] = int(self._current_position[m]  % self.fullRevolution(m))
                 elif c['command'] == 'SL':
-                    self._calculateCurrentPosition(m, c['value'])
+                    self._calculateCurrentPosition(m, c['direction'], c['value'])
                     # restrict the values to the proper range
                     self._current_position[m] = int(self._current_position[m]  % self.fullRevolution(m))
         return
 
 
-    def _calculateCurrentPosition(self, motor, maximum_rate):
+    def _calculateCurrentPosition(self, motor, direction, maximum_rate):
         m = motor
         pos_rate = int(self._runtime[m]**2 * self._accelerations[m] + self._runtime[m]*self._initial_velocity[m])
         # get current velocity and clamp it if necessary
         if pos_rate > maximum_rate or pos_rate == maximum_rate:
-            self._current_rate[m] = self._direction[m] * maximum_rate # clamp rate
+            self._current_rate[m] = direction * maximum_rate # clamp rate
             t = (maximum_rate - self._initial_velocity[m]) / self._accelerations[m] # time to reach maximum acceleration: t=(v-vi)/a
             # y = y(t=0)  +/- a*time_spent_accelerating/2 + v*time_at_constant_rate
-            self._current_position[m] = self._last_position[m] + int(self._direction[m] * (self._accelerations[m] * t)/2 + self._current_rate[m] * (self._runtime[m] - t))
+            self._current_position[m] = self._last_position[m] + int(direction * (self._accelerations[m] * t)/2 + self._current_rate[m] * (self._runtime[m] - t))
         else: # straightforward calculation
-            self._current_rate[m] = self._direction[m] * pos_rate
-            self._current_position[m] = self._last_position[m] + self._direction[m] * int(self._runtime[m]**2 * self._accelerations[m]/2 + self._runtime[m]*self._initial_velocity[m])
-        
+            self._current_rate[m] = direction * pos_rate
+            self._current_position[m] = self._last_position[m] + direction * int(self._runtime[m]**2 * self._accelerations[m]/2 + self._runtime[m]*self._initial_velocity[m])
+        #self._current_position[m] %= self.fullRevolution(m)
         return
              
     
     def stopMovement(self, motor):
+        self._current_position[motor] %= self.fullRevolution(motor)
         self._last_position[motor] = self._current_position[motor]
         self._current_rate[motor] = 0
         self._target_position[motor] = self._current_position[motor]
@@ -174,29 +177,33 @@ class DebugSerialTarget(QtWidgets.QWidget):
                     target = int(words[1])
                     if target == self._current_position[motor]:
                         continue
+                    elif target == self.fullRevolution(motor):
+                        target = 0
                     #time_to_take = abs(self._current_position[motor] - target)/self._rates[motor]
                     # two special cases: target and position on opposite sides of wheel but nearest across 360
                     if self._current_position[motor] < self.fullRevolution(motor)/4 and target > self.fullRevolution(motor)*3/4:
-                        self._direction[motor] = int(-1)
+                        direction = int(-1)
+                        target = target - self.fullRevolution(motor)
                     elif self._current_position[motor] > self.fullRevolution(motor)*3/4 and target < self.fullRevolution(motor)/4:
-                        self._direction[motor] = int(1)
+                        direction = int(1)
+                        target = target + self.fullRevolution(motor)
                     else:
-                        self._direction[motor] = int((target - self._current_position[motor])/abs(target - self._current_position[motor]))
-                    self._current_commands[motor] = {'command': command, 'value': target}
+                        direction = int((target - self._current_position[motor])/abs(target - self._current_position[motor]))
+                    self._current_commands[motor] = {'command': command, 'value': target, 'direction': direction}
                 # move to relative position
                 elif command == 'MR': 
                     delta = int(words[1])
                     target = (self._current_position[motor] + delta) % self.fullRevolution[motor]
-                    self._direction[motor] = delta//abs(delta)
-                    self._current_commands[motor] = {'command': command, 'value': target}
+                    direction = delta//abs(delta)
+                    self._current_commands[motor] = {'command': command, 'value': target, 'direction': direction}
                 elif command == 'SL':
                     rate = int(words[1])
                     if rate == 0:
                         self.stopMovement(motor)
                         self._current_commands[motor] = None
                     else:
-                        self._direction[motor] = rate//abs(rate)
-                        self._current_commands[motor] = {'command': command, 'value': abs(rate)}
+                        direction = rate//abs(rate)
+                        self._current_commands[motor] = {'command': command, 'value': abs(rate), 'direction': direction}
                 # set maximum velocity
                 elif command == 'VM':
                     self._maximum_rates[motor] = int(words[1])
